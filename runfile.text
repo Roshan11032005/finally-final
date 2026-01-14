@@ -1,0 +1,37 @@
+
+
+# 2. Make binary executable
+chmod +x s3_client
+
+# 3. Verify required shared library exists
+ls $HOME/build2/libs/libaws-c-s3.so*
+
+# 4. Export correct library path (IMPORTANT)
+export LD_LIBRARY_PATH=$HOME/build2/libs
+
+# 5. Verify linker can now find libraries
+ldd ./s3_client | grep aws
+
+# 6. Set runtime environment variables
+export ENDPOINT=http://localhost:9000
+export REGION=us-east-1
+export S3_BUCKET=testbucket
+export S3_KEY=test.bin
+export AWS_ACCESS_KEY_ID=minioadmin
+export AWS_SECRET_ACCESS_KEY=minioadmin
+export AWS_EC2_METADATA_DISABLED=true
+export N=10000
+
+# 7. Run the benchmark (DO NOT use sudo)
+./s3_client
+
+# ================================
+# OPTIONAL (Persistent Fix)
+# ================================
+
+# Copy libraries system-wide (run once)
+sudo cp $HOME/build2/libs/*.so* /usr/local/lib
+sudo ldconfig
+
+# After this, LD_LIBRARY_PATH is no longer needed
+./s3_client
